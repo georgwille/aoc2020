@@ -7,10 +7,8 @@ offset = {'E':1+0j,'N':0+1j,'W':-1+0j,'S':0-1j}
 rot = {'L':0+1j,'R':0-1j}
 
 for line in fin:
-    # print(p,o)
-    line = line.strip()
     letter = line[0]
-    number = int(line[1:])
+    number = int(line[1:-1])
     if letter in "ENWS":
         p += number*offset[letter]
     elif letter == "F":
