@@ -18,6 +18,8 @@ for i,element in enumerate(sched):
 rc.sort(key=lambda entry: entry[0])
 rc = rc[::-1]
 print(rc)
+# find x such that
+# division by r[k][0] leaves remainder r[k][1]
 
 # Chinese remainder theorem
 # we fill the requirements step by step
