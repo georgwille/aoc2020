@@ -36,9 +36,9 @@ for lc,line in enumerate(lines):
                 if char == '#':
                     thistile[i-1,c]=1
         tiles[tile_id]=thistile
-        print(thistile)
+        # print(thistile)
         borders[tile_id]=getborders(thistile)
-        print(borders[tile_id])
+        # print(borders[tile_id])
         for orientation in borders[tile_id]:
             for element in orientation:
                 try:
@@ -46,17 +46,16 @@ for lc,line in enumerate(lines):
                 except KeyError:
                     tile_with_border[element] = [tile_id]
 
-edgetiles = set()
 edgeborders = set()
 
 for border in tile_with_border:
     tiles = tile_with_border[border]
     if len(tiles) ==1:
-        edgetiles.add(tiles[0])
         edgeborders.add(border)
 
-print(edgetiles)
-print(edgeborders)
+# print(edgeborders)
+
+edgeproduct = 1
 
 for tile in borders:
     b = borders[tile]
@@ -67,5 +66,6 @@ for tile in borders:
                 cornercount +=1
     if cornercount == 4:
         print(tile)
+        edgeproduct *= tile
 
-
+print(edgeproduct)

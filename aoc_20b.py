@@ -34,6 +34,38 @@ def getborders(arr):
         thisarr = np.rot90(thisarr)
     return list1,list2
 
+def find_matching_tile(row,col,match='up'):
+    if match=='up':
+        nrow,ncol,where,twhere=row-1,col,2,0
+    elif match=='left':
+        nrow,ncol,where,twhere=row,col-1,1,3
+
+    target = borders[tileorder[nrow][ncol]][1][where]
+    matchingtiles = tile_with_border[target]
+    # print(matchingtiles)
+    newtile = matchingtiles[0] if matchingtiles[0] != tileorder[nrow][ncol] else matchingtiles[1]
+    if target in borders[newtile][1]:
+        tiles[newtile] = np.fliplr(tiles[newtile])
+        borders[newtile] = getborders(tiles[newtile])
+    while True:
+        if not(borders[newtile][0][twhere]==target):
+            tiles[newtile] = np.rot90(tiles[newtile])
+            borders[newtile] = getborders(tiles[newtile])
+        else:
+            break
+    return newtile
+
+def print_image(image):
+    for r in range(8*12):
+        for c in range(8*12):
+            if image[r,c]==1:
+                print('.',end='')
+            elif image[r,c]==0:
+                print(' ',end='')
+            else:
+                print(image[r,c],end='')
+        print()
+
 for lc,line in enumerate(lines):
     if line.startswith('Tile'):
         thistile = np.zeros((10,10),dtype='int8')
@@ -54,16 +86,13 @@ for lc,line in enumerate(lines):
                 except KeyError:
                     tile_with_border[element] = [tile_id]
 
-edgetiles = set()
 edgeborders = set()
 
 for border in tile_with_border:
     btiles = tile_with_border[border]
     if len(btiles) ==1:
-        edgetiles.add(btiles[0])
         edgeborders.add(border)
 
-# print(edgetiles)
 # print(edgeborders)
 
 for tile in borders:
@@ -78,8 +107,8 @@ for tile in borders:
         topleft = tile
         break
 
-print(tiles[topleft])
-print(borders[topleft])
+# print(tiles[topleft])
+# print(borders[topleft])
 
 while True:
     if not(borders[topleft][0][0] in edgeborders and borders[topleft][0][3] in edgeborders):
@@ -92,8 +121,8 @@ while True:
 # print(topleft)
 
 tileorder[0][0] = topleft
+# print(tileorder)
 
-print(tileorder)
 
 for row in range(12):
     for col in range(12):
@@ -103,51 +132,18 @@ for row in range(12):
             continue
         # if we are very left, match top border to row above
         if col == 0:
-            target = borders[tileorder[row-1][col]][1][2]
-            matchingtiles = tile_with_border[target]
-            # print(matchingtiles)
-            newtile = matchingtiles[0] if matchingtiles[0] != tileorder[row-1][col] else matchingtiles[1]
-            if target in borders[newtile][1]:
-                tiles[newtile] = np.fliplr(tiles[newtile])
-                borders[newtile] = getborders(tiles[newtile])
-            while True:
-                if not(borders[newtile][0][0]==target):
-                    tiles[newtile] = np.rot90(tiles[newtile])
-                    borders[newtile] = getborders(tiles[newtile])
-                else:
-                    break
+            direction = 'up'
         # otherwise, match left border to column on left
         else:
-            target = borders[tileorder[row][col-1]][1][1]
-            matchingtiles = tile_with_border[target]
-            # print(matchingtiles)
-            newtile = matchingtiles[0] if matchingtiles[0] != tileorder[row][col-1] else matchingtiles[1]
-            if target in borders[newtile][1]:
-                tiles[newtile] = np.fliplr(tiles[newtile])
-                borders[newtile] = getborders(tiles[newtile])
-            while True:
-                if not(borders[newtile][0][3]==target):
-                    tiles[newtile] = np.rot90(tiles[newtile])
-                    borders[newtile] = getborders(tiles[newtile])
-                else:
-                    break
-        tileorder[row][col] = newtile
+            direction = 'left'
+        tileorder[row][col] = find_matching_tile(row,col,direction)
+
 print(tileorder)
 
 for r in range(12):
     for c in range(12):
         image[r*8:r*8+8,c*8:c*8+8]=tiles[tileorder[r][c]][1:9,1:9]
 
-def print_image(image):
-    for r in range(8*12):
-        for c in range(8*12):
-            if image[r,c]==1:
-                print('.',end='')
-            elif image[r,c]==0:
-                print(' ',end='')
-            else:
-                print(image[r,c],end='')
-        print()
 
 print_image(image)
 
@@ -156,7 +152,7 @@ monster = np.asarray(
      [1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,1],
      [0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0]],dtype='int8')
 
-print(monster)
+# print(monster)
 
 monsterimage = image.copy()
 
